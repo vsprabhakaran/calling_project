@@ -69,19 +69,7 @@ input[type=button]{
    <div>
      <iframe src='' style="height:5em;width:100%;" ></iframe>
    </div>
-   <div id="searchPanel">
-     <div style="display:inline-block;">
-       Cheque Date: <input type="text" id="datepicker" style="width:40%">
-     </div>
-     <select id="circleMenu">
-       <option value="Chennai">Chennai</option>
-       <option value="Hyderabad">Hyderabad</option>
-       <option value="Bangalore">Bangalore</option>
-       <option value="Bhuvaneshwar">Bhuvaneshwar</option>
-       <option value="Kolkata">Kolkata</option>
-     </select>
-     <input type="button" name="filterButton" id="filterButton" value="submit" />
-   </div>
+   
 
    <form name="chequeProcessingForm" id="chequeProcessingForm" method="post" action="">
    	<!-- Storing the processing state-->
