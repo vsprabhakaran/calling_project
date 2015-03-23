@@ -7,8 +7,17 @@
   <link rel="stylesheet" href="css/pure-min.css">
   <?php
 	session_start();
-	$_SESSION["pf_index"] = "6716547";
-	$_SESSION["emp_name"] = "Prabhakaran S"
+  ini_set('display_errors','On');
+  error_reporting(E_ALL | E_STRICT);
+  require_once("db/dbConnection.php");
+  //$chequeDate=$_SESSION["chequeDate"];
+  //$circle=$_SESSION["circle"];
+  //$pfNo=$_SESSION["pfNo"];
+	$_SESSION["pfNo"] = "6716547";
+	$_SESSION["emp_name"] = "Prabhakaran S";
+  $pfNo="6716679";
+  $chequeDate="2015-03-19";
+  $circle="chennai";
   ?>
   <script>
   $(function() {
@@ -25,7 +34,7 @@ input[type=button]{
     color: #979797;
     color: #fff;
     text-transform:uppercase;
-    border:solid 1px #BFBDBD;
+    border:solid 1px #02aca3;
 }
   #chequeDetailsPanel,#searchPanel{
     text-align:center;
@@ -55,10 +64,7 @@ input[type=button]{
 				return false;
 			}
 		});
-		$("#chequeDetailsPanel").hide();
-		$("#chequeButtonPanel").hide();
-		$("#chequeListPanel").hide();
-		$("#chequeImagePanel").hide();
+		
 	});
 	</script>
 
@@ -88,6 +94,32 @@ input[type=button]{
          <th>Beneficiary name</th>
          <th>Amount</th>
        </tr>
+       <?php
+       $con=null;
+       db_prelude($con);
+       //fetches account numbers with aggregate cheque amount  > X in desc order which are not in status_Table(i.e)not fetched already
+       $query1=mysqli_query($con,"SELECT accountno,sum(amount) from ccpc_hvt_instruments_calling where (accountno NOT IN (select accountno from status_table)) group by accountno order by sum(amount) DESC LIMIT 0,1");
+       $accountNoRow=mysqli_fetch_array($query1);
+       $accNo= $accountNoRow['accountno'];
+       $query2=mysqli_query($con,"SELECT * from ccpc_hvt_instruments_calling where accountno='$accNo'");
+       $sno=1;
+       while($row=mysqli_fetch_Array($query2)){
+        $lockQuery=mysqli_query($con,"INSERT INTO status_table(MICRCODE, CHEQUENO, TC, ACCOUNTNO, CHEQUEDATE, STATUS_FLAG, LOCK_PF, COMMENTS)
+                     VALUES ('$row[MICRCODE]','$row[CHEQUENO]','$row[TC]','$row[ACCOUNTNO]','$row[CHEQUEDATE]','WL','$pfNo','')" );
+        $query3=mysqli_query($con,"SELECT amount,name from ccpc_hvt_instruments_calling
+                where MICRCODE='$row[MICRCODE]'AND CHEQUENO='$row[CHEQUENO]'AND TC='$row[TC]'AND ACCOUNTNO='$row[ACCOUNTNO]'AND CHEQUEDATE='$row[CHEQUEDATE]'");
+        $newRow=mysqli_fetch_Array($query3);
+        $amount=$newRow["amount"];
+        $name=$newRow["name"];
+         if($lockQuery){
+           echo "<tr><td>".$sno."</td>";$sno++;
+           echo "<td>".$row['CHEQUENO']."</td>";
+           echo "<td>".$row['ACCOUNTNO']."</td>";
+           echo "<td>".$name."</td>";
+           echo "<td>".$amount."</td>";
+         }
+       }
+       ?>
      </table>
    </div>
    <br/>
@@ -120,7 +152,7 @@ input[type=button]{
    </div>
    	<div id="chequeButtonPanel">
      <input type="button" name="prevButton" id="prevButton" value="Previous" />
-     <input type="button" name="nextButton" id="nextButton" value="Next" />
+     <input type="button" name="nextButton" id="nextButton" value="Next" onClick="validateAndLoadNextAccount()"/>
 	</div>
 	</form>
 </body>
