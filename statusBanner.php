@@ -65,7 +65,7 @@
 		<div class="banner_headLine">
 			<div><b>Your Status</b></div>
 			<div>PF Index : <?php echo $login_pfIndex; ?> </div>
-			<div>Date : </div>
+			<div>Date : <?php echo $chosen_date; ?></div>
 			<div>Pending : <?php echo getPFPending($login_pfIndex); ?></div>
 			<div>Completed : <?php echo getPFCompleted($login_pfIndex); ?> </div>
 		</div>
